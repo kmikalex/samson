@@ -2,10 +2,10 @@
 -- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Jan 01, 2021 at 09:46 PM
--- Server version: 5.7.29
--- PHP Version: 7.1.33
+-- Хост: 127.0.0.1:3306
+-- Время создания: Янв 05 2021 г., 23:13
+-- Версия сервера: 5.7.29
+-- Версия PHP: 7.1.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,28 +18,29 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `test_samson`
+-- База данных: `test_samson`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `a_category`
+-- Структура таблицы `a_category`
 --
 
 CREATE TABLE `a_category` (
   `id` int(11) NOT NULL,
-  `code` int(11) NOT NULL,
+  `code` int(11) DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `a_price`
+-- Структура таблицы `a_price`
 --
 
 CREATE TABLE `a_price` (
+  `id` int(11) NOT NULL,
   `a_product_id` int(11) NOT NULL,
   `type_of_price` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `price` float NOT NULL
@@ -48,7 +49,7 @@ CREATE TABLE `a_price` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `a_product`
+-- Структура таблицы `a_product`
 --
 
 CREATE TABLE `a_product` (
@@ -61,7 +62,7 @@ CREATE TABLE `a_product` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `a_property`
+-- Структура таблицы `a_property`
 --
 
 CREATE TABLE `a_property` (
@@ -72,7 +73,7 @@ CREATE TABLE `a_property` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `a_subcategory`
+-- Структура таблицы `a_subcategory`
 --
 
 CREATE TABLE `a_subcategory` (
@@ -82,36 +83,37 @@ CREATE TABLE `a_subcategory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Indexes for dumped tables
+-- Индексы сохранённых таблиц
 --
 
 --
--- Indexes for table `a_category`
+-- Индексы таблицы `a_category`
 --
 ALTER TABLE `a_category`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `a_price`
+-- Индексы таблицы `a_price`
 --
 ALTER TABLE `a_price`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `a_product_id` (`a_product_id`);
 
 --
--- Indexes for table `a_product`
+-- Индексы таблицы `a_product`
 --
 ALTER TABLE `a_product`
   ADD PRIMARY KEY (`id`),
   ADD KEY `a_category_id` (`a_category_id`);
 
 --
--- Indexes for table `a_property`
+-- Индексы таблицы `a_property`
 --
 ALTER TABLE `a_property`
   ADD KEY `a_product_id` (`a_product_id`);
 
 --
--- Indexes for table `a_subcategory`
+-- Индексы таблицы `a_subcategory`
 --
 ALTER TABLE `a_subcategory`
   ADD PRIMARY KEY (`id`),
@@ -119,51 +121,57 @@ ALTER TABLE `a_subcategory`
   ADD KEY `child_id` (`child_id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT для сохранённых таблиц
 --
 
 --
--- AUTO_INCREMENT for table `a_category`
+-- AUTO_INCREMENT для таблицы `a_category`
 --
 ALTER TABLE `a_category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
 
 --
--- AUTO_INCREMENT for table `a_product`
+-- AUTO_INCREMENT для таблицы `a_price`
+--
+ALTER TABLE `a_price`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+
+--
+-- AUTO_INCREMENT для таблицы `a_product`
 --
 ALTER TABLE `a_product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=109;
 
 --
--- AUTO_INCREMENT for table `a_subcategory`
+-- AUTO_INCREMENT для таблицы `a_subcategory`
 --
 ALTER TABLE `a_subcategory`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- Constraints for dumped tables
+-- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Constraints for table `a_price`
+-- Ограничения внешнего ключа таблицы `a_price`
 --
 ALTER TABLE `a_price`
   ADD CONSTRAINT `a_price_ibfk_1` FOREIGN KEY (`a_product_id`) REFERENCES `a_product` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `a_product`
+-- Ограничения внешнего ключа таблицы `a_product`
 --
 ALTER TABLE `a_product`
   ADD CONSTRAINT `a_product_ibfk_1` FOREIGN KEY (`a_category_id`) REFERENCES `a_category` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `a_property`
+-- Ограничения внешнего ключа таблицы `a_property`
 --
 ALTER TABLE `a_property`
   ADD CONSTRAINT `a_property_ibfk_1` FOREIGN KEY (`a_product_id`) REFERENCES `a_product` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `a_subcategory`
+-- Ограничения внешнего ключа таблицы `a_subcategory`
 --
 ALTER TABLE `a_subcategory`
   ADD CONSTRAINT `a_subcategory_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `a_category` (`id`) ON DELETE CASCADE,
