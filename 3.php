@@ -1,6 +1,8 @@
 <?php
 namespace Test3;
 
+error_reporting(E_ALL);
+
 class newBase
 {
     static private $count = 0;
@@ -19,7 +21,7 @@ class newBase
         $this->name = $name;
         self::$arSetName[] = $this->name;
     }
-    private $name;
+    protected $name;//'private $name;' must be inhereted because it is used in an inherited class
     /**
      * @return string
      */
@@ -41,19 +43,19 @@ class newBase
     public function getSize()
     {
         $size = strlen(serialize($this->value));
-        return strlen($size) + $size;
+        return $size;//what 'strlen($size) + ' is it?
     }
     public function __sleep()
     {
-        return ['value'];
+        return ['name', 'value'];//there is more properties
     }
     /**
      * @return string
      */
     public function getSave(): string
     {
-        $value = serialize($value);
-        return $this->name . ':' . sizeof($value) . ':' . $value;
+        $value = serialize($this->value);//it must have a $this->value
+        return $this->name . ':' . sizeof($this->value) . ':' . $value;//sizeof counts an amount of elements of object
     }
     /**
      * @return newBase
@@ -61,9 +63,12 @@ class newBase
     static public function load(string $value): newBase
     {
         $arValue = explode(':', $value);
-        return (new newBase($arValue[0]))
-            ->setValue(unserialize(substr($value, strlen($arValue[0]) + 1
-                + strlen($arValue[1]) + 1), $arValue[1]));
+
+        //it must return a newBase instance and it returned a result of performing of a setValue method
+        $ob = new newBase($arValue[0]);
+        $ob->setValue(unserialize(substr($value, strlen($arValue[0]) + 1
+            + strlen($arValue[1]) + 1), $arValue[1]));
+        return $ob;
     }
 }
 class newView extends newBase
@@ -91,9 +96,9 @@ class newView extends newBase
     }
     private function setSize()
     {
-        if (is_subclass_of($this->value, "Test3\newView")) {
+        if (is_subclass_of($this->value, "Test3\\newBase")) {//we need to correct a string "Test3\newView" to the 'Test3\\newBase'
             $this->size = parent::getSize() + 1 + strlen($this->property);
-        } elseif ($this->type == 'test') {
+        } elseif ($this->type == "Test3\\newBase") {//is this class is Test3\\newBase?
             $this->size = parent::getSize();
         } else {
             $this->size = strlen($this->value);
@@ -112,7 +117,7 @@ class newView extends newBase
     public function getName(): string
     {
         if (empty($this->name)) {
-            throw new Exception('The object doesn\'t have name');
+            throw new \Exception('The object doesn\'t have name');//it must be a fully qualified name \Exception
         }
         return '"' . $this->name  . '": ';
     }
@@ -137,8 +142,9 @@ class newView extends newBase
                 . $this->getType()
                 . $this->getSize()
                 . "\r\n";
-        } catch (Exception $exc) {
+        } catch (\Exception $exc) {//it must be a fully qualified name \Exception
             echo 'Error: ' . $exc->getMessage();
+            exit();
         }
     }
     /**
@@ -146,10 +152,11 @@ class newView extends newBase
      */
     public function getSave(): string
     {
-        if ($this->type == 'test') {
-            $this->value = $this->value->getSave();
-        }
-        return parent::getSave() . serialize($this->property);
+        //this is not need
+        //if ($this->type == 'test') {
+        //    $this->value = $this->value->getSave();
+        //}
+        return parent::getSave() . ':' . serialize($this->property);//to need to add :
     }
     /**
      * @return newView
@@ -157,12 +164,22 @@ class newView extends newBase
     static public function load(string $value): newBase
     {
         $arValue = explode(':', $value);
-        return (new newBase($arValue[0]))
-            ->setValue(unserialize(substr($value, strlen($arValue[0]) + 1
-                + strlen($arValue[1]) + 1), $arValue[1]))
-            ->setProperty(unserialize(substr($value, strlen($arValue[0]) + 1
-                + strlen($arValue[1]) + 1 + $arValue[1])))
-            ;
+        //it must return a newView instance and it returned a result of performing of a setValue method
+        $ob = new newView($arValue[0]);
+
+        $ob->setValue(unserialize(substr($value, strlen($arValue[0]) + 1 
+            + strlen($arValue[1]) + 1), [$arValue[4]]));//a second paremitor must be an array and has a type of newBase
+
+        $ob->setProperty(unserialize(substr($value, strlen($arValue[0]) + 1
+            + strlen($arValue[1]) + 1 + strlen($arValue[2]) + 1
+            + strlen($arValue[3]) + 1 + strlen($arValue[4]) + 1
+            + strlen($arValue[5]) + 1 + strlen($arValue[6]) + 1
+            + strlen($arValue[7]) + 1 + strlen($arValue[8]) + 1
+            + strlen($arValue[9]) + 1 + strlen($arValue[10]) + 1
+            + strlen($arValue[11]) + 1 + strlen($arValue[12]) + 1
+            + strlen($arValue[13]) + 1)));
+
+        return $ob;
     }
 }
 function gettype($value): string
@@ -170,8 +187,8 @@ function gettype($value): string
     if (is_object($value)) {
         $type = get_class($value);
         do {
-            if (strpos($type, "Test3\newBase") !== false) {
-                return 'test';
+            if (strpos($type, "Test3\\newBase") !== false) {//we need to correct a string "Test3\newBase" 
+                return 'Test3\\newBase';//this type is Test3\newBase!
             }
         } while ($type = get_parent_class($type));
     }
@@ -182,7 +199,7 @@ function gettype($value): string
 $obj = new newBase('12345');
 $obj->setValue('text');
 
-$obj2 = new \Test3\newView('O9876');
+$obj2 = new \Test3\newView('9876');//the value 'O9876' is not octal notation
 $obj2->setValue($obj);
 $obj2->setProperty('field');
 $obj2->getInfo();
